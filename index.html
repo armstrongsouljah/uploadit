@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jungle uploads</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        .hidden {display: none}
+    </style>
+    
+            
+</head>
+    <body>
+        <div class="container">
+            <h1 class="center page-header">Upload a file Below</h1>
+            <form action="#" id="fileForm">
+                <div class="file-field input-field">
+                <div class="btn">
+                    <span>File</span>
+                    <input id="filePicker" type="file">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+                </div>
+                <input id="uploadButton" type="submit" class="btn teal btn-small" value="Upload" />
+                <div class="preloader-wrapper small">
+                    <div class="spinner-layer spinner-green-only">
+                      <div class="circle-clipper left">
+                        <div class="circle"></div>
+                      </div><div class="gap-patch">
+                        <div class="circle"></div>
+                      </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="flashMessage green-txt hidden">File saved</p>
+            </form>
+        </div>
+        <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+
+        <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
+
+        <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+        <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-analytics.js"></script>
+
+        <!-- Add Firebase products that you want to use -->
+        <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-storage.js"></script>
+
+        <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script>
+
+              // Your web app's Firebase configuration
+              var firebaseConfig = {
+              apiKey: "AIzaSyCTdyDxpo09Dl7n6bKFzOBBEv-_wAnYETE",
+              authDomain: "uploadme-b14ff.firebaseapp.com",
+              databaseURL: "https://uploadme-b14ff.firebaseio.com",
+              projectId: "uploadme-b14ff",
+              storageBucket: "uploadme-b14ff.appspot.com",
+              messagingSenderId: "630321867190",
+              appId: "1:630321867190:web:ae6058f168658201003917",
+              measurementId: "G-NGR0E15X81"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            firebase.analytics();
+            let storage =  firebase.storage()
+
+            // firebase init stops here
+            const fileForm = document.querySelector('#fileForm');
+            const filePicker = document.querySelector('#filePicker');
+            let progressLoader = document.querySelector(".preloader-wrapper");
+            let flashMessage = document.querySelector('.flashMessage');
+            let fileHolder;
+
+            filePicker.addEventListener('change', (e) => {
+                fileHolder = e.target.files[0];
+            })
+
+            fileForm.addEventListener('submit', e => {
+                e.preventDefault()
+                let storageRef = storage.ref();
+                let imagesRef = storageRef.child(`images/${fileHolder.name}`)
+                let uploadTask = imagesRef.put(fileHolder);
+
+                // track progress
+                uploadTask.on('state_changed', snapshot => {
+                    progressLoader.classList.add("active")
+                    let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    if(progress == 100) {
+                        progressLoader.classList.remove("active")
+                        flashMessage.classList.remove('hidden');
+                        fileForm.reset();
+                        setTimeout(() => flashMessage.classList.add('hidden'), 2000);
+                    }
+                })
+
+            })
+        </script>
+    </body>
+</html>
