@@ -86,6 +86,7 @@
 
             fileForm.addEventListener('submit', e => {
                 e.preventDefault()
+                if(!fileHolder) alert('Please select a file to proceed!')
                 let storageRef = storage.ref();
                 let imagesRef = storageRef.child(`images/${fileHolder.name}`)
                 let uploadTask = imagesRef.put(fileHolder);
@@ -99,6 +100,22 @@
                         flashMessage.classList.remove('hidden');
                         fileForm.reset();
                         setTimeout(() => flashMessage.classList.add('hidden'), 2000);
+                        uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => console.log('saved at ', downloadURL))
+                    }
+                }, error => {
+                    switch (error.code) {
+                        case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        break;
+
+                        case 'storage/canceled':
+                        // User canceled the upload
+                        break;
+                        //...
+
+                        case 'storage/unknown':
+                        // Unknown error occurred, inspect error.serverResponse
+                        break;
                     }
                 })
 
